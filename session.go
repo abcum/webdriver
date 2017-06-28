@@ -28,24 +28,25 @@ type Session struct {
 	wd *Driver
 }
 
+// FindStrategy specifies which strategy to use when searching for elements.
 type FindStrategy string
 
 const (
-	//Returns an element whose class name contains the search value; compound class names are not permitted.
-	ClassName FindStrategy = "class name"
-	//Returns an element matching a CSS selector.
-	CSS_Selector = "css selector"
-	//Returns an element whose ID attribute matches the search value.
-	ID = "id"
-	//Returns an element whose NAME attribute matches the search value.
-	Name = "name"
-	//Returns an anchor element whose visible text matches the search value.
-	LinkText = "link text"
-	//Returns an anchor element whose visible text partially matches the search value.
-	PartialLinkText = "partial link text"
-	//Returns an element whose tag name matches the search value.
-	TagName = "tag name"
-	//Returns an element matching an XPath expression.
+	// FindByClass finds eelements whose class name contains the search value.
+	FindByClass FindStrategy = "class name"
+	// FindByCss finds elements matching a CSS selector.
+	FindByCss = "css selector"
+	// FindById finds elements whose ID attribute matches the search value.
+	FindById = "id"
+	// FindByName an element whose NAME attribute matches the search value.
+	FindByName = "name"
+	// FindByLinkText finds links whose visible text matches the search value.
+	FindByLinkText = "link text"
+	// FindByPartialLinkText finds links whose text partially matches the search value.
+	FindByPartialLinkText = "partial link text"
+	// FindByTagName finds elements whose tag name matches the search value.
+	FindByTagName = "tag name"
+	// XPath finds elements matching an XPath expression.
 	XPath = "xpath"
 )
 
@@ -127,7 +128,7 @@ func (s *Session) Back() error {
 	return err
 }
 
-// Back causes the browser to traverse one step forwards in the session history.
+// Forward causes the browser to traverse one step forwards in the session history.
 func (s *Session) Forward() error {
 	_, _, err := s.wd.post("/session/%s/forward", nil, s.ID)
 	return err
@@ -289,14 +290,14 @@ func (s *Session) TouchDown(x, y int) error {
 	return err
 }
 
-// TouchDown lifts a finger up from the page at the current coordinates.
+// TouchUp lifts a finger up from the page at the current coordinates.
 func (s *Session) TouchUp(x, y int) error {
 	opt := map[string]interface{}{"x": x, "y": y}
 	_, _, err := s.wd.post("/session/%s/touch/up", opt, s.ID)
 	return err
 }
 
-// TouchDown moves the currently pressed finsed on the page.
+// TouchMove moves the currently pressed finsed on the page.
 func (s *Session) TouchMove(x, y int) error {
 	opt := map[string]interface{}{"x": x, "y": y}
 	_, _, err := s.wd.post("/session/%s/touch/move", opt, s.ID)
@@ -331,7 +332,7 @@ func (s *Session) TouchFlick(e *Element, x, y, speed int) error {
 	return err
 }
 
-// TouchFlick flicks a finger on the screen starting anywhere.
+// TouchFlickAnywhere flicks a finger on the screen starting anywhere.
 func (s *Session) TouchFlickAnywhere(xspeed, yspeed int) error {
 	opt := map[string]interface{}{"xspeed": xspeed, "yspeed": yspeed}
 	_, _, err := s.wd.post("/session/%s/touch/flick", opt, s.ID)
