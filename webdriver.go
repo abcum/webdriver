@@ -21,16 +21,46 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"os/exec"
 )
 
 // Driver represents a WebDriver instance
 type Driver struct {
-	Url string
+	url string
+	exe string
+	cmd *exec.Cmd
 }
 
 // NewDriver creates a new driver instance.
-func NewDriver(path string) *Driver {
-	return &Driver{Url: path}
+func NewDriver(url, exe string) *Driver {
+	return &Driver{url: url, exe: exe}
+}
+
+func (w *Driver) Start() error {
+
+	if w.cmd != nil {
+		return nil
+	}
+
+	w.cmd = exec.Command(w.exe)
+
+	return w.cmd.Start()
+
+}
+
+func (w *Driver) Stop() error {
+
+	if w.cmd == nil {
+		return nil
+	}
+
+	w.cmd.Process.Signal(os.Interrupt)
+
+	w.cmd = nil
+
+	return nil
+
 }
 
 // Session creates a new WebDriver session, launching a new remote browser instance.
@@ -90,7 +120,7 @@ func (w *Driver) del(url string, pms ...interface{}) (id string, out []byte, err
 
 	var obj response
 
-	uri := w.Url + fmt.Sprintf(url, pms...)
+	uri := w.url + fmt.Sprintf(url, pms...)
 
 	req, err := http.NewRequest("DELETE", uri, nil)
 	if err != nil {
@@ -130,7 +160,7 @@ func (w *Driver) get(url string, pms ...interface{}) (id string, out []byte, err
 
 	var obj response
 
-	uri := w.Url + fmt.Sprintf(url, pms...)
+	uri := w.url + fmt.Sprintf(url, pms...)
 
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
@@ -179,7 +209,7 @@ func (w *Driver) post(url string, opt map[string]interface{}, pms ...interface{}
 		return "", nil, err
 	}
 
-	uri := w.Url + fmt.Sprintf(url, pms...)
+	uri := w.url + fmt.Sprintf(url, pms...)
 
 	req, err := http.NewRequest("POST", uri, bytes.NewReader(jsn))
 	if err != nil {
